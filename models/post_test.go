@@ -39,6 +39,8 @@ func TestPost_Answer(t *testing.T) {
 	if err := Connect(); err != nil {
 		t.Errorf("Connect() error = %v", err)
 	}
+	defer Close()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &Post{
@@ -54,7 +56,43 @@ func TestPost_Answer(t *testing.T) {
 			db.Delete(p)
 		})
 	}
-	if err := Close(); err != nil {
-		t.Errorf("Close() error = %v", err)
+}
+
+func TestGetQuestions(t *testing.T) {
+	if err := Connect(); err != nil {
+		t.Errorf("Connect() error = %v", err)
+	}
+	defer Close()
+
+	questions := []*Post{
+		{
+			Answers: []*Post{
+				{},
+				{},
+				{},
+			},
+		},
+		{
+			Answers: []*Post{
+				{},
+			},
+		},
+		{
+			Answers: []*Post{},
+		},
+	}
+	db.Create(questions)
+	defer func() {
+		for _, question := range questions {
+			db.Delete(question.Answers)
+		}
+		db.Delete(questions)
+	}()
+	getQuestions, err := GetQuestions()
+	if err != nil {
+		t.Errorf("GetQuestions() error = %v", err)
+	}
+	if len(getQuestions) != 3 {
+		t.Errorf("no question was found")
 	}
 }
