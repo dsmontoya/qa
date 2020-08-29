@@ -25,6 +25,18 @@ func Close() error {
 	return s.Close()
 }
 
+func Create(value interface{}) error {
+	return db.Create(value).Error
+}
+
+func First(dest interface{}, conds ...interface{}) error {
+	return db.First(dest, conds...).Error
+}
+
 func Migrate() error {
 	return db.Migrator().AutoMigrate(&Post{})
+}
+
+func Where(query interface{}, args ...interface{}) *gorm.DB {
+	return db.Where(query, args...)
 }

@@ -1,16 +1,27 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Post struct {
-	gorm.Model
-	Content    string
-	QuestionID *uint
-	Answers    []*Post `gorm:"foreignkey:QuestionID"`
+	ID         uint           `json:"id" gorm:"primarykey"`
+	CreatedAt  time.Time      `json:"createdAt"`
+	UpdatedAt  time.Time      `json:"updatedAt"`
+	DeletedAt  gorm.DeletedAt `json:"-" gorm:"index"`
+	Content    string         `json:"content"`
+	QuestionID *uint          `json:"-"`
+	Answers    []*Post        `json:"answers,omitempty" gorm:"foreignkey:QuestionID"`
 }
 
-func (p *Post) Answer(content string) error {
-	return db.Model(p).Association("Answers").Append(&Post{Content: content})
+func (p *Post) Answer(content string) (*Post, error) {
+	answer := &Post{Content: content}
+	if err := db.Model(p).Association("Answers").Append(answer); err != nil {
+		return nil, err
+	}
+	return answer, nil
 }
 
 func GetQuestions() ([]*Post, error) {

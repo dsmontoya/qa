@@ -2,13 +2,10 @@ package models
 
 import (
 	"testing"
-
-	"gorm.io/gorm"
 )
 
 func TestPost_Answer(t *testing.T) {
 	type fields struct {
-		Model      gorm.Model
 		Content    string
 		QuestionID *uint
 		Answers    []*Post
@@ -25,7 +22,6 @@ func TestPost_Answer(t *testing.T) {
 		{
 			"answer",
 			fields{
-				gorm.Model{},
 				"Is this a question?",
 				nil,
 				nil,
@@ -44,13 +40,16 @@ func TestPost_Answer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &Post{
-				Model:      tt.fields.Model,
 				Content:    tt.fields.Content,
 				QuestionID: tt.fields.QuestionID,
 				Answers:    tt.fields.Answers,
 			}
-			if err := p.Answer(tt.args.content); (err != nil) != tt.wantErr {
+			answer, err := p.Answer(tt.args.content)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Post.Answer() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if answer.ID == 0 {
+				t.Errorf("invalid Post.Answer() id")
 			}
 			db.Model(p).Association("Answers").Clear()
 			db.Delete(p)

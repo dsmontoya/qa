@@ -1,6 +1,7 @@
 package main
 
 import (
+	"qa/handlers"
 	"qa/models"
 
 	"github.com/gin-gonic/gin"
@@ -15,17 +16,9 @@ func main() {
 		panic(err)
 	}
 	r := gin.Default()
-	r.GET("/questions", func(c *gin.Context) {
-
-	})
-	r.POST("/questions", func(c *gin.Context) {
-
-	})
-	r.PUT("/questions/:questionID", func(c *gin.Context) {
-
-	})
-	r.POST("/questions/:questionID/answers/:answerID", func(c *gin.Context) {
-
-	})
+	r.GET("/questions", handlers.GetQuestions)
+	r.POST("/questions", handlers.Ask)
+	r.PUT("/posts/:id", handlers.UpdatePost)
+	r.POST("/questions/:questionID/answers", handlers.Answer)
 	r.Run()
 }
